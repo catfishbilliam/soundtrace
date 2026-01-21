@@ -83,6 +83,11 @@ const shareTextEl = pickEl("shareText");
 const downloadJsonBtn = pickEl("downloadJsonBtn");
 const downloadCsvBtn = pickEl("downloadCsvBtn");
 
+const shareCardEl = pickEl("shareCard");
+const buildSharePngBtn = pickEl("buildSharePngBtn");
+const shareDownloadRowEl = pickEl("shareDownloadRow");
+const sharePngLinkEl = pickEl("sharePngLink");
+
 let charts = {};
 let lastMergedRows = [];
 let lastSummary = null;
@@ -130,6 +135,9 @@ if (runBtn) {
 
       setStatus("");
       renderAll(summary, deduped);
+      renderShareCard(summary);
+      downloadSharePngBtn?.classList.remove("hidden");
+      downloadSharePngBtn?.addEventListener("click", () => downloadSharePng());
       renderDataExplorer(deduped);
       runRevealAnimations();
     } catch (err) {
@@ -1612,4 +1620,90 @@ function aggregatedRowsToCsv(rows) {
   }
 
   return lines.join("\n");
+}
+
+function renderShareCard(summary) {
+  if (!shareCardEl) return;
+
+  shareCardEl.classList.remove("hidden");
+
+  if (shareRangeEl && summary.date_min && summary.date_max) {
+    shareRangeEl.textContent =
+      `${summary.date_min.toISOString().slice(0,10)} → ${summary.date_max.toISOString().slice(0,10)} (UTC)`;
+  }
+
+  if (shareStatsEl) {
+    shareStatsEl.innerHTML = [
+      statChip("Total minutes", formatInt(Math.round(summary.total_minutes))),
+      statChip("Total plays", formatInt(summary.total_plays)),
+      statChip("Artists", formatInt(summary.unique_artists)),
+      statChip("Tracks", formatInt(summary.unique_tracks))
+    ].join("");
+  }
+
+  if (shareTopArtistsTableEl) {
+    shareTopArtistsTableEl.innerHTML = renderTable(
+      (summary.top_artists || []).slice(0, 10).map(a => ({
+        artist: a.artist,
+        minutes: round1(a.total_minutes),
+        plays: a.plays,
+        top_track: a.top_track
+      }))
+    );
+  }
+
+  if (shareTopTracksTableEl) {
+    shareTopTracksTableEl.innerHTML = renderTable(
+      (summary.top_tracks || []).slice(0, 10).map(t => ({
+        track: t.track,
+        artist: t.artist,
+        minutes: round1(t.total_minutes),
+        plays: t.plays
+      }))
+    );
+  }
+
+  try { charts.shareYear?.destroy(); } catch {}
+  try { charts.shareWeekday?.destroy(); } catch {}
+
+  charts.shareYear = renderLine(
+    pickEl("shareYearChart"),
+    summary.year_totals.map(r => String(r.year)),
+    summary.year_totals.map(r => r.total_minutes),
+    "Minutes"
+  );
+
+  charts.shareWeekday = renderBar(
+    pickEl("shareWeekdayChart"),
+    summary.day_of_week.map(r => r.dow),
+    summary.day_of_week.map(r => r.total_minutes),
+    "Minutes"
+  );
+}
+
+function statChip(label, value) {
+  return `<div class="shareStat"><div class="shareStatVal">${escapeHtml(value)}</div><div class="shareStatLab">${escapeHtml(label)}</div></div>`;
+}
+
+async function downloadSharePng() {
+  if (!shareCardEl || !window.html2canvas) {
+    alert("html2canvas not loaded.");
+    return;
+  }
+
+  const wasHidden = shareCardEl.classList.contains("hidden");
+  shareCardEl.classList.remove("hidden");
+
+  const canvas = await html2canvas(shareCardEl, {
+    backgroundColor: "#0b0b0b",
+    scale: 2,
+    useCORS: true
+  });
+
+  const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+  if (!blob) return;
+
+  downloadBlob(blob, "soundtrace_share.png");
+
+  if (wasHidden) shareCardEl.classList.add("hidden");
 }

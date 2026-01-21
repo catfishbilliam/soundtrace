@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 
 <body>
@@ -142,6 +143,44 @@
         <button id="downloadCsvBtn">Download merged CSV</button>
       </div>
     </section>
+<section id="shareCard" class="shareCard hidden">
+  <div class="shareHeader">
+    <div class="shareTitle">Soundtrace</div>
+    <div id="shareRange" class="shareRange"></div>
+  </div>
+
+  <div class="shareStats" id="shareStats"></div>
+
+  <div class="shareGrid">
+    <div class="shareBlock">
+      <h3>Total minutes by year</h3>
+      <canvas id="shareYearChart"></canvas>
+    </div>
+
+    <div class="shareBlock">
+      <h3>Weekday listening</h3>
+      <canvas id="shareWeekdayChart"></canvas>
+    </div>
+
+    <div class="shareBlock">
+      <h3>Top artists</h3>
+      <div id="shareTopArtistsTable"></div>
+    </div>
+
+    <div class="shareBlock">
+      <h3>Top tracks</h3>
+      <div id="shareTopTracksTable"></div>
+    </div>
+  </div>
+</section>
+
+<div id="shareDownloadRow" class="hidden" style="margin:12px 0;">
+  <a id="sharePngLink" class="primaryBtn" download="soundtrace_share.png">Download share image (PNG)</a>
+</div>
+
+<button id="buildSharePngBtn" class="primary hidden" type="button">
+  Build share image
+</button>
 
   </main>
 
