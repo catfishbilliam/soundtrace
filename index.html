@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SoundTrace</title>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+</head>
+
+<body>
+  <header class="sticky-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brandTitle">All-Time Spotify Wrapped</span>
+        <span class="brandTag">Music Edition</span>
+      </div>
+
+      <div class="header-actions">
+        <input id="fileInput" type="file" accept=".csv" multiple />
+        <button id="runBtn" class="primary">Generate</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="card">
+      <h1 class="pageTitle"><span class="titleGlow">All-Time Spotify Wrapped</span></h1>
+      <p class="subtitle">Music-only recap. Podcasts are excluded.</p>
+      <p id="status" class="hint"></p>
+    </section>
+
+    <section id="stats" class="stats hidden">
+      <div class="stat"><span id="totalMinutes">–</span><label>Total minutes</label></div>
+      <div class="stat"><span id="totalPlays">–</span><label>Total plays</label></div>
+      <div class="stat"><span id="uniqueArtists">–</span><label>Artists</label></div>
+      <div class="stat"><span id="uniqueTracks">–</span><label>Tracks</label></div>
+    </section>
+    <p id="dateRange" class="hint hidden"></p>
+
+    <section id="charts" class="grid hidden">
+
+      <div class="card span-12 chartCard">
+        <h2>Total Listening Time by Year</h2>
+        <div class="chartWrap"><canvas id="yearTotalChart"></canvas></div>
+      </div>
+
+      <div class="card span-12 chartCard">
+        <h2>Total Listening Time by Month (All Years)</h2>
+        <div class="chartWrap"><canvas id="monthOfYearChart"></canvas></div>
+      </div>
+
+      <div class="card span-12 chartCard">
+        <h2>Total Listening Time by Weekday</h2>
+        <div class="chartWrap"><canvas id="weekdayChart"></canvas></div>
+      </div>
+
+      <div class="card span-12 chartCard">
+        <h2>Total Listening Time by Hour of Day</h2>
+        <div class="chartWrap"><canvas id="hourChart"></canvas></div>
+      </div>
+
+      <div class="card span-12 chartCard">
+        <h2>Total Listening Time by Season</h2>
+        <div class="chartWrap"><canvas id="seasonChart"></canvas></div>
+      </div>
+
+      <div class="card span-6 chartCard">
+        <h2>Top Artists</h2>
+        <div class="chartWrap"><canvas id="topArtistsChart"></canvas></div>
+        <div id="topArtistsTable" class="tableWrap"></div>
+      </div>
+
+      <div class="card span-6 chartCard">
+        <h2>Top Tracks</h2>
+        <div class="chartWrap"><canvas id="topTracksChart"></canvas></div>
+        <div id="topTracksTable" class="tableWrap"></div>
+      </div>
+
+      <div class="card span-12 chartCard">
+        <h2>Top 10 Most Consistent Artists (Monthly Presence)</h2>
+        <div class="chartWrap"><canvas id="consistentArtistsChart"></canvas></div>
+      </div>
+
+      <div class="card span-12 chartCard">
+        <h2>Monthly Listening Intensity — Top Artists</h2>
+        <div class="chartWrap tall"><canvas id="monthlyIntensityMatrixChart"></canvas></div>
+      </div>
+
+      <div class="card span-12 chartCard">
+        <h2>Consistency Score vs Dominance (Monthly)</h2>
+        <div class="chartWrap tall"><canvas id="consistencyBubbleChart"></canvas></div>
+      </div>
+
+      <div class="card span-12">
+        <h2>Preview (first 200 rows)</h2>
+        <div id="previewTable" class="tableWrap"></div>
+      </div>
+
+      <div class="card span-12" id="byYearWrap">
+        <h2>Year-by-year highlights</h2>
+        <p class="hint">Top 5 artists per year with top song, minutes, and a consistency score (lower = steadier month-to-month).</p>
+        <div id="byYear" class="byYear"></div>
+      </div>
+
+    </section>
+
+    <section class="card" id="dataExplorerWrap">
+      <h2>Data explorer</h2>
+
+      <div class="explorer-controls">
+        <input id="deSearch" type="search" placeholder="Search artist, track, album, source…" />
+        <select id="dePageSize">
+          <option value="25">25 / page</option>
+          <option value="50" selected>50 / page</option>
+          <option value="100">100 / page</option>
+          <option value="200">200 / page</option>
+        </select>
+
+        <button id="dePrevBtn" type="button">Prev</button>
+        <button id="deNextBtn" type="button">Next</button>
+
+        <span id="deMeta" class="hint"></span>
+
+        <button id="deDownloadBtn" type="button" class="primary">Download filtered CSV</button>
+      </div>
+
+      <div id="dataExplorer" class="table-wrap"></div>
+    </section>
+
+    <section id="export" class="card hidden">
+      <h2>Share & export</h2>
+      <textarea id="shareText" rows="8"></textarea>
+      <div class="actions">
+        <button id="downloadJsonBtn">Download JSON</button>
+        <button id="downloadCsvBtn">Download merged CSV</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
