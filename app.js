@@ -62,6 +62,11 @@ const dateRangeEl = pickEl("dateRange");
 const totalMinutesEl = pickEl("totalMinutes");
 const totalPlaysEl = pickEl("totalPlays");
 
+const shareRangeEl = pickEl("shareRange");
+const shareStatsEl = pickEl("shareStats");
+const shareTopArtistsTableEl = pickEl("shareTopArtistsTable");
+const shareTopTracksTableEl = pickEl("shareTopTracksTable");
+
 const uniqueArtistsEl = pickEl("uniqueArtists", "uniqueCreators");
 const uniqueTracksEl = pickEl("uniqueTracks", "uniqueItems");
 
@@ -136,8 +141,8 @@ if (runBtn) {
       setStatus("");
       renderAll(summary, deduped);
       renderShareCard(summary);
-      downloadSharePngBtn?.classList.remove("hidden");
-      downloadSharePngBtn?.addEventListener("click", () => downloadSharePng());
+      buildSharePngBtn?.classList.remove("hidden");
+      buildSharePngBtn?.addEventListener("click", downloadSharePng);
       renderDataExplorer(deduped);
       runRevealAnimations();
     } catch (err) {
